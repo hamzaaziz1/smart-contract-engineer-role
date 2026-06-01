@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+:root {
+  --background: #0b0f14;
+  --foreground: #e8eef6;
+  --card: #121a24;
+  --accent: #3b82f6;
+  --accent-muted: #1e3a5f;
+  --border: #243044;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
+body {
+  background: radial-gradient(ellipse at top, #152238 0%, var(--background) 55%);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #93c5fd;
+}
+
+.prose-invert {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: #f8fafc;
+  --tw-prose-lead: #cbd5e1;
+  --tw-prose-links: #60a5fa;
+  --tw-prose-bold: #f8fafc;
+  --tw-prose-bullets: #64748b;
+}
+
+.card {
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--accent-muted);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+
+.input {
+  background: #0a1018;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  color: var(--foreground);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.badge-open {
+  color: #93c5fd;
+  background: #1e3a5f;
+}
+.badge-accepted {
+  color: #fde68a;
+  background: #422006;
+}
+.badge-submitted {
+  color: #fdba74;
+  background: #431407;
+}
+.badge-completed {
+  color: #86efac;
+  background: #14532d;
+}
+.badge-cancelled,
+.badge-refunded {
+  color: #cbd5e1;
+  background: #334155;
+}
