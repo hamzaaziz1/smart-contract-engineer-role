@@ -136,11 +136,14 @@ export function useQuestList() {
   return { quests, loading, refresh };
 }
 
-/** Implement write helpers with useWriteContract + useWaitForTransactionReceipt. */
 export function useCreateQuest() {
   const { isConnected } = useAccount();
+  const { writeContractAsync } = useWriteContract();
+  const [hash, setHash] = useState<`0x${string}` | undefined>();
 
-  const createEthQuest = async (_input: {
+  const { isLoading: isPending } = useWaitForTransactionReceipt({ hash });
+
+  const createEthQuest = async (input: {
     title: string;
     description: string;
     rewardEth: string;
@@ -148,38 +151,97 @@ export function useCreateQuest() {
     reviewPeriodHours: number;
   }) => {
     if (!isConnected) throw new Error("Connect MetaMask or another Web3 wallet first");
-    // TODO: useWriteContract → createQuest with value: parseEther(rewardEth), token: zeroAddress
-    throw new Error("TODO: implement useCreateQuest.createEthQuest");
+
+    const reward = parseEther(input.rewardEth);
+    const acceptDeadlineTs = BigInt(Math.floor(input.acceptDeadline.getTime() / 1000));
+    const reviewPeriod = BigInt(input.reviewPeriodHours * 3600);
+
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "createQuest",
+      args: [input.title, input.description, reward, acceptDeadlineTs, reviewPeriod, zeroAddress],
+      value: reward,
+    });
+
+    setHash(txHash);
+    return txHash;
   };
 
-  return { createEthQuest, isPending: false };
+  return { createEthQuest, isPending };
 }
 
 export function useQuestActions(questId: bigint) {
+  const { writeContractAsync } = useWriteContract();
+  const [hash, setHash] = useState<`0x${string}` | undefined>();
+
+  const { isLoading: isPending } = useWaitForTransactionReceipt({ hash });
+
   const accept = async () => {
-    // TODO: writeContract acceptQuest(questId)
-    throw new Error("TODO: implement accept");
-  };
-  const submit = async (_deliverableUri: string) => {
-    // TODO: writeContract submitWork(questId, deliverableUri)
-    throw new Error("TODO: implement submit");
-  };
-  const approve = async () => {
-    // TODO: writeContract approveAndPay(questId)
-    throw new Error("TODO: implement approve");
-  };
-  const claimTimeout = async () => {
-    // TODO: writeContract claimTimeoutPayout(questId)
-    throw new Error("TODO: implement claimTimeout");
-  };
-  const cancel = async () => {
-    // TODO: writeContract cancelQuest(questId)
-    throw new Error("TODO: implement cancel");
-  };
-  const refund = async () => {
-    // TODO: writeContract refundPoster(questId)
-    throw new Error("TODO: implement refund");
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "acceptQuest",
+      args: [questId],
+    });
+    setHash(txHash);
+    return txHash;
   };
 
-  return { accept, submit, approve, claimTimeout, cancel, refund, isPending: false };
+  const submit = async (deliverableUri: string) => {
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "submitWork",
+      args: [questId, deliverableUri],
+    });
+    setHash(txHash);
+    return txHash;
+  };
+
+  const approve = async () => {
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "approveAndPay",
+      args: [questId],
+    });
+    setHash(txHash);
+    return txHash;
+  };
+
+  const claimTimeout = async () => {
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "claimTimeoutPayout",
+      args: [questId],
+    });
+    setHash(txHash);
+    return txHash;
+  };
+
+  const cancel = async () => {
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "cancelQuest",
+      args: [questId],
+    });
+    setHash(txHash);
+    return txHash;
+  };
+
+  const refund = async () => {
+    const txHash = await writeContractAsync({
+      address: QUEST_ESCROW_ADDRESS,
+      abi: questEscrowAbi,
+      functionName: "refundPoster",
+      args: [questId],
+    });
+    setHash(txHash);
+    return txHash;
+  };
+
+  return { accept, submit, approve, claimTimeout, cancel, refund, isPending };
 }
